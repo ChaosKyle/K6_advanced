@@ -7,7 +7,8 @@ This repository demonstrates how to set up automated performance testing using K
 - `test.js` - K6 performance test script
 - `.github/workflows/k6-performance-test.yml` - GitHub Actions workflow
 - `SECRETS.md` - Documentation for required GitHub secrets
-- `trigger-pipeline.sh` - Interactive script to trigger and monitor the CI/CD pipeline
+- `trigger-pipeline.sh` - Interactive bash script to trigger and monitor the CI/CD pipeline
+- `trigger-pipeline.ps1` - Interactive PowerShell script to trigger and monitor the CI/CD pipeline
 
 ## Quick Start
 
@@ -86,11 +87,15 @@ The CI/CD pipeline automatically runs tests in the following scenarios:
 ### Manual Triggers
 You can also manually trigger tests:
 
-1. **Using the provided script** (Recommended):
+1. **Using the provided scripts** (Recommended):
    ```bash
+   # For Linux/macOS/WSL
    ./trigger-pipeline.sh
+   
+   # For Windows PowerShell
+   .\trigger-pipeline.ps1
    ```
-   This interactive script provides multiple options to trigger the pipeline and monitor results.
+   These interactive scripts provide multiple options to trigger the pipeline and monitor results.
 
 2. **Via GitHub UI**:
    - Go to Actions tab in your repository

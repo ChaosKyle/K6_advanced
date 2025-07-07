@@ -14,18 +14,19 @@ if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if GitHub CLI is installed
-if ! command -v gh &> /dev/null; then
-    echo "❌ Error: GitHub CLI (gh) is not installed"
-    echo "Install it from: https://cli.github.com/"
-    exit 1
-fi
-
-# Check if user is authenticated with GitHub
-if ! gh auth status &> /dev/null; then
-    echo "❌ Error: Not authenticated with GitHub"
-    echo "Run: gh auth login"
-    exit 1
+# Check if GitHub CLI is installed (optional for some features)
+GH_AVAILABLE=false
+if command -v gh &> /dev/null; then
+    if gh auth status &> /dev/null 2>&1; then
+        GH_AVAILABLE=true
+        echo "✅ GitHub CLI detected and authenticated"
+    else
+        echo "⚠️  GitHub CLI found but not authenticated"
+        echo "   Run 'gh auth login' to enable advanced features"
+    fi
+else
+    echo "⚠️  GitHub CLI not installed"
+    echo "   Install from: https://cli.github.com/ for advanced features"
 fi
 
 # Get current branch
@@ -42,8 +43,13 @@ echo ""
 echo "Choose how to trigger the pipeline:"
 echo "1. Push current branch (triggers workflow automatically)"
 echo "2. Create a test commit and push (demonstrates commit-based trigger)"
-echo "3. Manual workflow dispatch (requires workflow_dispatch trigger)"
-echo "4. View current pipeline status"
+if [[ "$GH_AVAILABLE" == true ]]; then
+    echo "3. Manual workflow dispatch (GitHub CLI)"
+    echo "4. View current pipeline status (GitHub CLI)"
+else
+    echo "3. Manual workflow dispatch (requires GitHub CLI - not available)"
+    echo "4. View current pipeline status (requires GitHub CLI - not available)"
+fi
 echo "5. Exit"
 echo ""
 
@@ -69,17 +75,27 @@ case $choice in
         echo "📄 Created test-trigger.txt (you can delete this file later)"
         ;;
     3)
-        echo "🎯 Attempting manual workflow dispatch..."
-        if gh workflow run "k6 Performance Test" 2>/dev/null; then
-            echo "✅ Manual workflow triggered successfully!"
+        if [[ "$GH_AVAILABLE" == true ]]; then
+            echo "🎯 Attempting manual workflow dispatch..."
+            if gh workflow run "k6 Performance Test" 2>/dev/null; then
+                echo "✅ Manual workflow triggered successfully!"
+            else
+                echo "❌ Manual dispatch failed. The workflow might not support workflow_dispatch."
+                echo "   Try option 1 or 2 instead."
+            fi
         else
-            echo "❌ Manual dispatch failed. The workflow might not support workflow_dispatch."
-            echo "   Try option 1 or 2 instead."
+            echo "❌ GitHub CLI not available. Install and authenticate with GitHub CLI first."
+            echo "   Alternative: Use option 1 or 2 to trigger via git push"
         fi
         ;;
     4)
-        echo "📊 Current pipeline status:"
-        gh run list --limit 5
+        if [[ "$GH_AVAILABLE" == true ]]; then
+            echo "📊 Current pipeline status:"
+            gh run list --limit 5
+        else
+            echo "❌ GitHub CLI not available. Install and authenticate with GitHub CLI first."
+            echo "   Alternative: Check pipeline status at: https://github.com/your-username/your-repo/actions"
+        fi
         ;;
     5)
         echo "👋 Goodbye!"
@@ -93,9 +109,15 @@ esac
 
 echo ""
 echo "📈 Monitoring pipeline:"
-echo "   • View in browser: gh repo view --web"
-echo "   • Check status: gh run list"
-echo "   • Follow logs: gh run watch"
+if [[ "$GH_AVAILABLE" == true ]]; then
+    echo "   • View in browser: gh repo view --web"
+    echo "   • Check status: gh run list"
+    echo "   • Follow logs: gh run watch"
+else
+    echo "   • View in browser: Visit your GitHub repository > Actions tab"
+    echo "   • Check status: Refresh the Actions page"
+    echo "   • Follow logs: Click on any workflow run"
+fi
 echo ""
 
 if [[ "$CURRENT_BRANCH" == "main" ]]; then
