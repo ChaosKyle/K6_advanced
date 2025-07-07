@@ -1,0 +1,76 @@
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: simple-test
+  namespace: k6-operator-system
+spec:
+  parallelism: 4
+  script:
+    configMap:
+      name: simple-test-script
+      file: test.js
+  separate: false
+  runner:
+    image: grafana/k6:latest
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    env:
+      - name: K6_OUT
+        value: "json"
+
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: load-test
+  namespace: k6-operator-system
+spec:
+  parallelism: 8
+  script:
+    configMap:
+      name: load-test-script
+      file: test.js
+  separate: false
+  runner:
+    image: grafana/k6:latest
+    resources:
+      requests:
+        cpu: 200m
+        memory: 256Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+    env:
+      - name: K6_OUT
+        value: "json"
+
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: stress-test
+  namespace: k6-operator-system
+spec:
+  parallelism: 16
+  script:
+    configMap:
+      name: stress-test-script
+      file: test.js
+  separate: false
+  runner:
+    image: grafana/k6:latest
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+    env:
+      - name: K6_OUT
+        value: "json"
