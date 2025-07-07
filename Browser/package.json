@@ -1,0 +1,25 @@
+{
+  "name": "k6-browser-test-lab",
+  "version": "1.0.0",
+  "description": "K6 browser testing lab with practical examples",
+  "main": "index.js",
+  "scripts": {
+    "test": "k6 run tests/",
+    "test:basic": "k6 run tests/basic-browser-test.js",
+    "test:form": "k6 run tests/form-interaction-test.js",
+    "test:nav": "k6 run tests/navigation-screenshot-test.js",
+    "test:headful": "K6_BROWSER_HEADLESS=false k6 run tests/basic-browser-test.js"
+  },
+  "keywords": [
+    "k6",
+    "browser",
+    "testing",
+    "performance",
+    "automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "k6": "^0.48.0"
+  }
+}
